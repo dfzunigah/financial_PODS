@@ -89,21 +89,22 @@ def focus_days(fullhouse_days, date_from, date_to):
     #Diccionario que contiene la relación "Día de la semana : Número de días".
     weekdays = days_vector[1]
     weekdays = dict(weekdays)
+    try:
+        if(fullhouse_days == 7):
+            return total_days
 
-    if(fullhouse_days == 7):
-        return total_days
-    
-    elif(fullhouse_days == 6):
-        mon_sat = weekdays['lun.'] + weekdays['mar.'] + weekdays['mié.'] + weekdays['jue.'] + weekdays['vie.'] + weekdays['sáb.']
-        return mon_sat
-    
-    elif(fullhouse_days == 5):
-        mon_fri = weekdays['lun.'] + weekdays['mar.'] + weekdays['mié.'] + weekdays['jue.'] + weekdays['vie.']
-        return mon_fri
-    
-    else:
-        print("Hay un error en algún lado.")
+        elif(fullhouse_days == 6):
+            mon_sat = weekdays[operations.day_target(0)] + weekdays[operations.day_target(1)] + weekdays[operations.day_target(2)] + weekdays[operations.day_target(3)] + weekdays[operations.day_target(4)] + weekdays[operations.day_target(5)]
+            return mon_sat
 
+        elif(fullhouse_days == 5):
+            mon_fri = weekdays[operations.day_target(0)] + weekdays[operations.day_target(1)] + weekdays[operations.day_target(2)] + weekdays[operations.day_target(3)] + weekdays[operations.day_target(4)]
+            return mon_fri
+
+        else:
+            print("Hay un error en algún lado.")
+    except:
+        print ("Eche monda, revisa las fechas ingresadas (Como mínimo la operación debe ser mayor a una semana.)")
 
 def pod_earnings(vector_representation):
     """
@@ -129,15 +130,16 @@ def pod_earnings(vector_representation):
 
     #Separa cada variable del vector que representa el escenario en variables individuales para un mejor manejo.
     price_array = price_vector(vector_representation[0]) #Crea un vector de precios según el precio base  por hora.
-    capacity = vector_representation[1]
-    fullhouse_days = vector_representation[2]
-    staying_time = vector_representation[3]
-    leaving_time = vector_representation[4]
-    LJ_hours = vector_representation[5]
-    Fri_hours = vector_representation[6]
-    start_date = vector_representation[7]
-    J24_date = vector_representation[8]
-    end_date = vector_representation[9]
+    longtail_capacity = vector_representation[1]
+    focus_capacity = vector_representation[2]
+    fullhouse_days = vector_representation[3]
+    staying_time = vector_representation[4]
+    leaving_time = vector_representation[5]
+    LJ_hours = vector_representation[6]
+    Fri_hours = vector_representation[7]
+    start_date = vector_representation[8]
+    J24_date = vector_representation[9]
+    end_date = vector_representation[10]
 
     #El tiempo que dura cada operación sera el tiempo de estadía sumado al tiempo que demore en arreglarse el POD.
     operation_time = staying_time + leaving_time
@@ -150,20 +152,18 @@ def pod_earnings(vector_representation):
     operations_per_day = daily_minutes // operation_time
     #Número de operaciones realizadas en un día viernes.
     friday_operations = friday_minutes // operation_time
-
+    
     #Se obtiene el precio de cada operación.
     operation_price = price_per_time(staying_time, price_array)
 
     #Calculamos el número total de días y la frecuencia de cada día de la semana durante todos los 3 primeros meses.
     #No se tiene en cuenta el día en que inicia la J24. Tomamos el segundo elemento, el diccionario de frecuencias de cada día.
     longtail_days = operations.days_counter(start_date, J24_date)[1]
-    #Se hace el cambio a diccionario para poder acceder a los elementos sin problema.
     longtail_days = dict(longtail_days)
     #Número de lunes, martes, miercoles y jueves en los 3 meses.
-    mon_thu = longtail_days['lun.'] + longtail_days['mar.'] + longtail_days['mié.'] + longtail_days['jue.']
+    mon_thu = longtail_days[operations.day_target(0)] + longtail_days[operations.day_target(1)] + longtail_days[operations.day_target(2)] + longtail_days[operations.day_target(3)]
     #Número de viernes en los 3 meses.
-    fri = longtail_days['vie.']
-
+    fri = longtail_days[operations.day_target(4)]
 
     #Dinero ganado por pod un día normal (L - J)
     LJ_money = operation_price * operations_per_day
@@ -190,9 +190,6 @@ def pod_earnings(vector_representation):
     #Dinero ganado por un pod en el mes de la J24.
     focus_monthly_money = daily_focus_money * J24_days
 
-    #Ganancias totales en el semestre por pod.
-    earnings = focus_monthly_money + longtail_money
-
     #Añade todos los valores de ganancia en un vector.
     earnings_vector.append(LJ_money)
     earnings_vector.append(friday_money)
@@ -200,10 +197,16 @@ def pod_earnings(vector_representation):
     earnings_vector.append(longtail_money)
     earnings_vector.append(daily_focus_money)
     earnings_vector.append(focus_monthly_money)
-    earnings_vector.append(earnings)
 
     #Ajusta los valores según el porcentaje de uso.
     for index,value in enumerate(earnings_vector):
-        earnings_vector[index] = (value * capacity) / 100
-             
+        if (index <= 3):
+            earnings_vector[index] = (value * longtail_capacity) / 100
+        else:
+            earnings_vector[index] = (value * focus_capacity) / 100
+
+    #Ganancias totales en el semestre por pod.
+    earnings = earnings_vector[3] + earnings_vector[5]
+    earnings_vector.append(earnings)
+
     return earnings_vector

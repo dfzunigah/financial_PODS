@@ -15,7 +15,7 @@ import operations
 from termcolor import colored
 
 def operation_printer(answer, vector_representation, operations_vector, earnings_vector, implements_vector,
-                      washing_vector, own_vector, dotation_vector, web_vector, rent_vector):
+                      washing_vector, own_vector, dotation_vector, web_vector, rent_vector, liquidation_vector):
     """
 @Description: De acuerdo a la respuesta del usuario, muestra la interpretación de toda la operación durante el semestre.
 
@@ -45,6 +45,7 @@ def operation_printer(answer, vector_representation, operations_vector, earnings
     dotation_array = dotation_vector
     web_array = web_vector
     rent_array = rent_vector
+    liquidation_array = liquidation_vector
 
     #Mostrará sólo los balances.
     if (answer == 'N'):
@@ -58,6 +59,8 @@ def operation_printer(answer, vector_representation, operations_vector, earnings
         dotation_balance(dotation_array,1)
         web_balance(web_array,1)
         rent_balance(rent_array,1)
+        print("\n\t\tDefinitiva\n")
+        liquidation_balance(liquidation_array,1)
         print()
 
     #Mostrará todos los resultados.
@@ -74,6 +77,8 @@ def operation_printer(answer, vector_representation, operations_vector, earnings
         dotation_full(dotation_array)
         web_full(web_array)
         rent_full(rent_array)
+        print("\n\t\tDefinitiva\n")
+        liquidation_balance(liquidation_array, 1)
         print()
 
 
@@ -236,7 +241,7 @@ def implements_balance(implements_vector, type):
 @params:
     implements_vector [list]: Contiene la información relacionada con los costos de compra de implements.
     Referenciese al método "money_out.implements_cost()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver es el valor (0) o la interpretación.
 
 @result: Text.
     """
@@ -252,7 +257,7 @@ def washing_balance(washing_vector, type):
 
 @params:
     washing_vector [list]: Contiene la información relacionada con los costos de lavado. Referenciese al método "money_out.washing_cost()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver es el valor (0) o la interpretación.
 
 @result: Text.
     """
@@ -268,7 +273,7 @@ def own_balance(salary_vector, type):
 
 @params:
     salary_vector [list]: Contiene la información relacionada con mi propio salario. Referenciese al método "money_out.own_salary()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver (0) es el valor o la interpretación.
 
 @result: Text.
     """
@@ -284,7 +289,7 @@ def dotation_balance(dotation_vector, type):
 
 @params:
     dotation_vector [list]: Contiene la información relacionada con los costos de dotación. Referenciese al método "money_out.dotation_cost()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver (0) es el valor o la interpretación.
 
 @result: Text.
     """
@@ -300,7 +305,7 @@ def rent_balance(rent_vector, type):
 
 @params:
     rent_vector [list]: Contiene la información relacionada con los costos de la renta de la bodega. Referenciese al método "money_out.rent_cost()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver (0) es el valor o la interpretación.
 
 @result: Text.
     """
@@ -316,7 +321,7 @@ def web_balance(web_vector, type):
 
 @params:
     web_vector [list]: Contiene la información relacionada con los costos de la página web. Referenciese al método "money_out.web_cost()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver (0) es el valor o la interpretación.
 
 @result: Text.
     """
@@ -333,19 +338,19 @@ def web_balance(web_vector, type):
 
 def scenario_full(vector_representation):
     """
-@Description: Interpretación del vector de representación del escenario.
+@Description: Interpretación del vector de representación del escenario. No existe "scenario_balance", no es necesario.
 
 @params:
     vector_representation [list]: Contiene la información relacionada el escenario. Referenciese al método "operations.vector_representation()"
 
 @result: Text.
     """
-    print("Operación comenzando el",vector_representation[7],"con el inicio de la J24 el",vector_representation[8],"y terminando el", vector_representation[9])
-    print("Trabajando",vector_representation[5],"horas de lunes a jueves y",vector_representation[6],"horas los viernes. Y",vector_representation[2],"días a la semana durante la J24.")
-    print("Cobrando $",vector_representation[0],"por un tiempo de estadía de",vector_representation[3],"minutos.")
-    print("Teniendo en cuenta que el tiempo de desalojo/preparación es de", vector_representation[4],"minutos.")
-    print("Operando al", vector_representation[1],"% de la capacidad.")
-    print()
+    precio = money_in.price_per_time(vector_representation[4], money_in.price_vector(vector_representation[0]))
+    print("Operación comenzando el",vector_representation[8],"con el inicio de la J24 el",vector_representation[9],"y terminando el", vector_representation[10])
+    print("Trabajando",vector_representation[6],"horas de lunes a jueves y",vector_representation[7],"horas los viernes. Y",vector_representation[3],"días a la semana durante la J24.")
+    print("Cobrando $", precio,"por un tiempo de estadía de",vector_representation[4],"minutos.")
+    print("Teniendo en cuenta que el tiempo de desalojo/preparación es de", vector_representation[5],"minutos.")
+    print("Operando al", vector_representation[1],"% de la capacidad durante los tres primeros meses y al", vector_representation[2],"% de la capacidad en la J24.\n")
 
 
 def clients_full(operations_vector):
@@ -364,6 +369,7 @@ def clients_full(operations_vector):
     print("Número de operaciones/clientes un día de la J24:", operations_vector[3])
     print("Número de operaciones/clientes en la J24:", operations_vector[4])
     print("Número de operaciones/clientes en el semestre:", operations_vector[5])
+    print()
 
     #SOLO-BALANCE
 
@@ -373,7 +379,7 @@ def clients_balance(operations_vector, type):
 
 @params:
     operations_vector [list]: Contiene la información relacionada con las operaciones . Referenciese al método "operations.operations_counter()"
-    type [int]: Indica si el resultado a volver es el valor o la interpretación.
+    type [int]: Indica si el resultado a volver es el valor (0) o la interpretación.
 
 @result: Text.
     """
@@ -381,3 +387,49 @@ def clients_balance(operations_vector, type):
         return operations_vector[5]
     else:
         print("Número de operaciones/clientes:", operations_vector[5])
+
+
+def liquidation_balance(liquidation_vector, type):
+    """
+@Description: Devuelve la interpretación/resumen de la liquidación de un escenario. No existe "liquidation_full", no es necesario.
+
+@params:
+    liquidation_vector [list]: Contiene la información relacionada con la liquidación de un escenario.
+    type [int]: Indica si el resultado a volver es el valor (0) o la interpretación.
+
+@result:
+    Dependiendo de el tipo que haya elegido el usuario, devuelve el valor [int] o una interpretación textual.
+    """
+
+    if(type == 0):
+        return liquidation_vector[0]
+    else:
+        if (liquidation_vector[0] < 0):
+            semester = colored(locale.currency(liquidation_vector[0], grouping=True), 'red')
+        else:
+            semester = colored(locale.currency(liquidation_vector[0], grouping=True),'green')
+
+        if (liquidation_vector[1] < 0):
+            anual = colored(locale.currency(liquidation_vector[1], grouping=True), 'red')
+        else:
+            anual = colored(locale.currency(liquidation_vector[1], grouping=True),'green')
+
+        print("Liquidación semestral:", semester)
+        print("Liquidación anual:", anual)
+
+def tipping_balance(tipping_vector, type):
+    """
+@Description: Devuelve la interpretación/resumen del punto de equilibrio de un escenario. No existe "tripping_full", no es necesario.
+
+@params:
+    tipping_vector [list]: Contiene la información relacionada con el punto de equilibrio de un escenario.
+    type [int]: Indica si el resultado a volver es el valor (0) o la interpretación.
+
+@result:
+    Dependiendo de el tipo que haya elegido el usuario, devuelve el valor [int] o una interpretación textual.
+    """
+    if (type == 0):
+        return tipping_vector[0]
+    else:
+        print("Se requieren de",tipping_vector[0],"pods para poder general utilidades en este escenario.")
+        print("Usando este número de PODS generarías",tipping_vector[1], "en utilidades.")
